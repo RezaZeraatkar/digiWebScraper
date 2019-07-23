@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import cssutils
-   
+
 class digikalaCrawler(scrapy.Spider):
     name = "digikalaCrawler"
     
