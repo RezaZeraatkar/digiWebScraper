@@ -18,8 +18,6 @@ class digikalaCrawler(scrapy.Spider):
 
     def parse(self, response):
         #response.url.split("/")[-2]
-        page = 'main'
-        filename = '%s.txt' % page
         subcat_lis = response.css('.c-navi-new-list__sublist-option--title')
         hrefs = subcat_lis.css('a.c-navi-new__big-display-title::attr("href")').getall() 
         yield response.follow(hrefs[0], self.get_products_info)
@@ -39,52 +37,110 @@ class digikalaCrawler(scrapy.Spider):
 #                       product_id: 0,
 #                       product_name: product_Names[0],
 #                       star_rating: 74.4%,
-#                       npVoted: 165,
+#                       n_peaple_voted: 165,
 #                       Price: 170000,
 #                       urlLinkTo: ‘’,
 #               }
 #               {
 #                       product_id: 1,
 #                       productName: product_titles[1],
-#                       starRating: 74.4%,
+#                       star_rating: 74.4%,
 #                       npVoted: 165,
 #                       Price: 170000,
 #                       urlLinkTo: ‘’,
 #               }, ...
 #           ]
     def get_products_info(self, response):
+        list_of_products_data = []
         product_box_content_div = response.css('.c-product-box__content')
-        product_names = product_box_content_div.css('.c-product-box__title').xpath('./a/text()').getall()
-        star_ratings_style = product_box_content_div.css('.c-product-box__rate-comparision').css('.c-stars-plp__selected').xpath('@style').getall()
-        
-        star_ratings = list()
-        for css in star_ratings_style:
-            parsed_css = cssutils.parseStyle(str(css))
-            for each in parsed_css:
-                star_ratings.append(each.value)
         
         
-        
-        if len(product_names) == 36:
-            print("product_names == 36")
-        if len(star_ratings) == 36:
-            print("star_ratings == 36")
+        for eachproduct in product_box_content_div:
+            dictionary = {}
+            # check if product id recorded for this product
+            if self.is_child_node_exist(eachproduct.xpath('.//div[contains(@class, "c-product-box__title")]'), 'a'):
+                # Store in dictionary
+                product_id = eachproduct.xpath('.//div[contains(@class, "c-product-box__title")]').css('a::attr(data-adro-ad-click-id)').get()
+                dictionary['product_id'] = product_id
+            else:
+                # Store Unknown in dictionary
+                dictionary['product_id'] = 'Unknown'
+            
+            # check if product name recorded for this product
+            if self.is_child_node_exist(eachproduct.css('.c-product-box__title'), 'a'):
+                # Store in dictionary
+                product_name = eachproduct.css('.c-product-box__title').xpath('./a/text()').get()
+                dictionary['product_name'] = product_name
+            else:
+                dictionary['product_name'] = 'Unknown'
 
+            # check if star rating recorded for this product
+            if self.is_child_node_exist(eachproduct.css('.c-product-box__rate-comparision'), 'div'):
+                # Store in dictionary
+                rate = 0
+                width_attr_str = eachproduct.css('.c-product-box__rate-comparision').css('.c-stars-plp__selected').xpath('@style').get()
+                width_attr_css = cssutils.parseStyle(width_attr_str)
+                rate = width_attr_css.width.split('%')[0]
+                dictionary['product_rate'] = rate
+            else:
+                dictionary['product_rate'] = 'Unknown'
+                
+            # check if npVotes recorded for this product
+            if self.is_child_node_exist(eachproduct.css('.c-product-box__rate-comparision'), 'div'):
+                npVotes = 0
+                npVotes_str = eachproduct.css('.c-product-box__rate-comparision--rate-people::text').get()
+                ls = npVotes_str.split()
+                for s in ls: 
+                    ds = s.split(',') 
+                    s = ''.join(ds) 
+                    if s.isdigit():
+                        npVotes = int(s)
+                dictionary['npVotes'] = npVotes
+            else:
+                dictionary['npVotes'] = 'Unknown'
+
+            
+            # check if price recorded for this product
+            if self.is_child_node_exist(eachproduct.xpath('.//div[contains(@class, "c-price__value c-price__value--plp")]'), 'div'):
+                price = 0
+                price_str = eachproduct.xpath('.//div[contains(@class, "c-price__value c-price__value--plp")]').xpath('.//div[contains(@class, "c-price__value-wrapper")]/text()').get()             
+                ls = price_str.split()
+                for s in ls:
+                    ds = s.split(',') 
+                    s = ''.join(ds) 
+                    if s.isdigit():
+                        price = int(s)
+                dictionary['price'] = price
+            else:
+                dictionary['price'] = 'Unknown'
+                
+            # check if linkTo recorded for this product
+            if self.is_child_node_exist(eachproduct.css('.c-product-box__title'), 'a'):
+                linkTo = eachproduct.xpath('.//div[contains(@class, "c-product-box__title")]').css('a::attr(href)').get()
+                dictionary['linkTo'] = linkTo
+            else:
+                dictionary['linkTo'] = 'Unknown'
+            
+            list_of_products_data.append(dictionary)
+        
+
+        # write to a .csv file
+        print(list_of_products_data)
 
 
 
 #    input: url/?pageno=i
 #    output: {
 #                isnextpage: true|false,
-#                nextpage: htmltoparse
+#                nextpage: response
 #                
 #            }
-    def nextPage(self, url, pageno = 1):
+    def next_page(self, url, pageno = 1):
+#        Note: url correct format to crawl successfully:
+#        for example: 
+#        https://www.digikala.com/search/category-mobile-accessories/?pageno=5&sortby=4 (incorrect)
+#        https://www.digikala.com/search/category-mobile-accessories/?pageno=5 (correct)
         pass
-
-
-
-
 
 
 
@@ -93,33 +149,13 @@ class digikalaCrawler(scrapy.Spider):
     def parse_products_urls(self):
         pass
     
-
-    
-
-#import scrapy
 #
-#
-#class AuthorSpider(scrapy.Spider):
-#    name = 'author'
-#
-#    start_urls = ['http://quotes.toscrape.com/']
-#
-#    def parse(self, response):
-#        # follow links to author pages
-#        for href in response.css('.author + a::attr(href)'):
-#            yield response.follow(href, self.parse_author)
-#
-#        # follow pagination links
-#        for href in response.css('li.next a::attr(href)'):
-#            yield response.follow(href, self.parse)
-#
-#    def parse_author(self, response):
-#        def extract_with_css(query):
-#            return response.css(query).get(default='').strip()
-#
-#        yield {
-#            'name': extract_with_css('h3.author-title::text'),
-#            'birthdate': extract_with_css('.author-born-date::text'),
-#            'bio': extract_with_css('.author-description::text'),
-#        }
-#    
+#    input: <parent div>
+#    output: boolean
+    def is_child_node_exist(self, parent, childtype):
+        s = './{}'.format(str(childtype))
+        if(parent.xpath(s).get() is None):
+#            print('{0} has no child div element!'.format(parent.get()))
+            return False
+        else:
+            return True

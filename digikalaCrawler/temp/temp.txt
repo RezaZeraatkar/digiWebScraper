@@ -1,0 +1,65 @@
+#        star_ratings_style = product_box_content_div.css('.c-product-box__rate-comparision').css('.c-stars-plp__selected').xpath('@style').getall()
+        
+#        product_ids = product_box_content_div.xpath('.//div[contains(@class, "c-product-box__title")]').css('a::attr(data-adro-ad-click-id)').getall()
+#        product_names = product_box_content_div.css('.c-product-box__title').xpath('./a/text()').getall()
+#        star_ratings = list()
+#        n_peaple_voted = product_box_content_div.css('.c-product-box__rate-comparision--rate-people::text').re(r'\n\s*(\d).+\n')
+#        prices = product_box_content_div.xpath('.//div[contains(@class, "c-price__value c-price__value--plp")]').xpath('.//div[contains(@class, "c-price__value-wrapper")]/text()').re(r'\d+,\d+')
+#        links_to = product_box_content_div.xpath('.//div[contains(@class, "c-product-box__title")]').css('a::attr(href)').getall()
+        
+        
+#        for css in star_ratings_style:
+#            parsed_css.append(cssutils.parseStyle(str(css)))
+#            
+#        for each in parsed_css:
+#                star_ratings.append(each.width)
+        
+#        print(product_ids)
+#        print(links_to)
+#        if len(product_names) == 36:
+#            print("product_names == 36")
+#        if len(star_ratings) == 36:
+#            print("star_ratings == 36")
+#        if len(n_peaple_voted) == 36:
+#            print("n_peaple_voted == 36")
+#        if len(prices) == 36:
+#            print("prices == 36")
+#        if len(product_ids) == 36:
+#            print("product_ids == 36")
+#        if len(links_to) == 36:
+#            print("links_to == 36")
+
+
+
+
+
+#import scrapy
+#
+#
+#class AuthorSpider(scrapy.Spider):
+#    name = 'author'
+#
+#    start_urls = ['http://quotes.toscrape.com/']
+#
+#    def parse(self, response):
+#        # follow links to author pages
+#        for href in response.css('.author + a::attr(href)'):
+#            yield response.follow(href, self.parse_author)
+#
+#        # follow pagination links
+#        for href in response.css('li.next a::attr(href)'):
+#            yield response.follow(href, self.parse)
+#
+#    def parse_author(self, response):
+#        def extract_with_css(query):
+#            return response.css(query).get(default='').strip()
+#
+#        yield {
+#            'name': extract_with_css('h3.author-title::text'),
+#            'birthdate': extract_with_css('.author-born-date::text'),
+#            'bio': extract_with_css('.author-description::text'),
+#        }
+#    
+
+
+
