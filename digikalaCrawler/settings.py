@@ -18,19 +18,19 @@ NEWSPIDER_MODULE = 'digikalaCrawler.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+# USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-# PROXY_LIST = []
-# THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-# MY_FILE = os.path.join(THIS_FOLDER, 'proxy-list.txt')
-# with open(MY_FILE, 'r') as f:
-#     for eachline in f:
-#         PROXY_LIST.append(eachline.strip('\n'))
-# # print(PROXY_LIST)
-# ROTATING_PROXY_LIST = PROXY_LIST
+PROXY_LIST = []
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+MY_FILE = os.path.join(THIS_FOLDER, 'proxy-list.txt')
+with open(MY_FILE, 'r') as f:
+    for eachline in f:
+        PROXY_LIST.append(eachline.strip('\n'))
+
+ROTATING_PROXY_LIST = PROXY_LIST
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 1
@@ -40,8 +40,8 @@ CONCURRENT_REQUESTS = 1
 # See also autothrottle settings and docs
 DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 1
-#CONCURRENT_REQUESTS_PER_IP = 16
+# CONCURRENT_REQUESTS_PER_DOMAIN = 1
+CONCURRENT_REQUESTS_PER_IP = 1
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -74,18 +74,18 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 1
 
 # scrapy -> splash -> proxy -> website
 DOWNLOADER_MIDDLEWARES = {
-    # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    # 'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
-    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
     # 'scrapy_splash.SplashCookiesMiddleware': 723,
     # 'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
 }
 
-# RANDOM_UA_PER_PROXY = True
-
+RANDOM_UA_PER_PROXY = True
+ROTATING_PROXY_PAGE_RETRY_TIMES = 20
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
 # EXTENSIONS = {
