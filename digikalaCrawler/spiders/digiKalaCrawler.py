@@ -169,7 +169,7 @@ class digikalaCrawler(scrapy.Spider):
             else:
                 items["cat"] = "Unknown"
             product_id = items["product_id"]
-            abs_link_to_comments = f'https://www.digikala.com/ajax/product/comments/{product_id}/?page=1&mode=buyers'
+            abs_link_to_comments = str(f'https://www.digikala.com/ajax/product/comments/{product_id}/?page=1&mode=buyers')
             yield scrapy.Request(url = abs_link_to_comments, callback=self.go_to_product_details, meta={'product_general_info': items, 'com_data': []})
         # check to see if any review exist for this product
         elif response.css(".c-comments__list"):
